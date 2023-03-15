@@ -27,7 +27,7 @@ function! CustomFoldText(string) abort
 
     let foldSize = 1 + v:foldend - v:foldstart
     let foldPercentage = ''
-    if has('float')
+    if get(g:, 'custom_foldtext_show_percentage', 0) && has('float')
         let lineCount = line('$')
         try
             let foldPercentage = printf('[%4.1f%%] ', (foldSize * 1.0) / lineCount * 100)
@@ -40,7 +40,11 @@ function! CustomFoldText(string) abort
     let indent = repeat(' ', exists('*shiftwidth') ? shiftwidth() : &shiftwidth)
     let indent = ''
 
-    let foldSizeStr = printf(' %4d lines ', foldSize)
+    if strlen(foldPercentage)
+        let foldSizeStr = printf(' %4d lines ', foldSize)
+    else
+        let foldSizeStr = printf(' %s[%s lines] ', repeat(' ', 4 - len(string(foldSize))), foldSize)
+    endif
     let foldLevelStr = '+' . v:folddashes
     let foldLevelStr = '' " disable fold level display
 
