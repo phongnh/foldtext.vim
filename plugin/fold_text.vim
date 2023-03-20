@@ -1,6 +1,14 @@
 
 " Modification of https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
 
+function! s:strwidth(str) abort
+    if exists('*strwidth')
+        return strwidth(a:str)
+    else
+        return strlen(string(a:str))
+    endif
+endfunction
+
 function! CustomFoldText(string) abort
     " get first non-blank line
     let fs = v:foldstart
@@ -23,9 +31,11 @@ function! CustomFoldText(string) abort
     let foldLineHead = line
 
     let win_size = get(g:, 'custom_foldtext_max_width', winwidth(0))
-    let w = win_size - &foldcolumn - (&number ? &numberwidth : 0) - (&l:signcolumn is# 'yes' ? 2 : 0)
+    let sign_column_size = has('signs') && !empty(sign_getplaced(bufname('%'), { 'group': '*' })[0]['signs']) ? 2 : 0
+    let w = win_size - &foldcolumn - (&number ? s:strwidth(line('$')) : 0) - sign_column_size
 
     let foldSize = 1 + v:foldend - v:foldstart
+
     let foldPercentage = ''
     if has('float')
         let lineCount = line('$')
