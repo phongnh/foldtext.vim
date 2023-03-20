@@ -9,6 +9,17 @@ function! s:strwidth(str) abort
     endif
 endfunction
 
+function! s:calculate_sign_column_width() abort
+    if has('signs')
+        if !empty(sign_getplaced(bufname('%'), { 'group': '*' })[0]['signs'])
+            return 2
+        elseif &signcolumn == 'yes'
+            return 2
+        endif
+    endif
+    return 0
+endfunction
+
 function! CustomFoldText(string) abort
     " get first non-blank line
     let fs = v:foldstart
@@ -31,7 +42,7 @@ function! CustomFoldText(string) abort
     let foldLineHead = line
 
     let win_size = get(g:, 'custom_foldtext_max_width', winwidth(0))
-    let sign_column_size = has('signs') && !empty(sign_getplaced(bufname('%'), { 'group': '*' })[0]['signs']) ? 2 : 0
+    let sign_column_size = s:calculate_sign_column_width()
     let w = win_size - &foldcolumn - (&number ? s:strwidth(line('$')) : 0) - sign_column_size
 
     let foldSize = 1 + v:foldend - v:foldstart
